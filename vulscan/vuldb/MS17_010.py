@@ -16,6 +16,7 @@ def get_plugin_info():
     }
     return plugin_info
 
+
 def check(ip, port, timeout):
     negotiate_protocol_request = binascii.unhexlify(
         "00000054ff534d42720000000018012800000000000000000000000000002f4b0000c55e003100024c414e4d414e312e3000024c4d312e325830303200024e54204c414e4d414e20312e3000024e54204c4d20302e313200")
@@ -30,11 +31,13 @@ def check(ip, port, timeout):
         s.send(session_setup_request)
         data = s.recv(1024)
         user_id = data[32:34]
-        tree_connect_andx_request = "000000%xff534d42750000000018012000000000000000000000000000002f4b%sc55e04ff000000000001001a00005c5c%s5c49504324003f3f3f3f3f00" % ((58 + len(ip)), user_id.encode('hex'), ip.encode('hex'))
+        tree_connect_andx_request = "000000%xff534d42750000000018012000000000000000000000000000002f4b%sc55e04ff000000000001001a00005c5c%s5c49504324003f3f3f3f3f00" % (
+            (58 + len(ip)), user_id.encode('hex'), ip.encode('hex'))
         s.send(binascii.unhexlify(tree_connect_andx_request))
         data = s.recv(1024)
         allid = data[28:36]
-        payload = "0000004aff534d422500000000180128000000000000000000000000%s1000000000ffffffff0000000000000000000000004a0000004a0002002300000007005c504950455c00" % allid.encode('hex')
+        payload = "0000004aff534d422500000000180128000000000000000000000000%s1000000000ffffffff0000000000000000000000004a0000004a0002002300000007005c504950455c00" % allid.encode(
+            'hex')
         s.send(binascii.unhexlify(payload))
         data = s.recv(1024)
         s.close()

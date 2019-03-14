@@ -1,9 +1,11 @@
 # -*- coding: UTF-8 -*-
 
 from functools import wraps
-from flask import session,url_for, redirect,logging
+from flask import session, url_for, redirect, logging
 
 # 登录状态检查
+
+
 def logincheck(f):
     @wraps(f)
     def wrapper(*args, **kwargs):

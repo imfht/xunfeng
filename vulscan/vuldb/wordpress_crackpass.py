@@ -60,7 +60,8 @@ def check(ip, port, timeout):
             domain_sp = domain.split('.')
             pass_list.append(domain)
             pass_list.append(domain_sp[0])
-            pass_list.append(domain_sp[len(domain_sp) - 2] + "." + domain_sp[len(domain_sp) - 1])
+            pass_list.append(
+                domain_sp[len(domain_sp) - 2] + "." + domain_sp[len(domain_sp) - 1])
             pass_list.append(domain_sp[len(domain_sp) - 2])
         except:
             pass
@@ -68,8 +69,9 @@ def check(ip, port, timeout):
             try:
                 login_path = '/xmlrpc.php'
                 PostStr = "<?xml version='1.0' encoding='iso-8859-1'?><methodCall>  <methodName>wp.getUsersBlogs</methodName>  <params>   <param><value>%s</value></param>   <param><value>%s</value></param>  </params></methodCall>" % (
-                user_str, pass_str)
-                request = urllib2.Request('http://' + url + login_path, PostStr)
+                    user_str, pass_str)
+                request = urllib2.Request(
+                    'http://' + url + login_path, PostStr)
                 res = urllib2.urlopen(request, timeout=timeout)
                 res_html = res.read()
                 for flag in flag_list:
@@ -77,6 +79,7 @@ def check(ip, port, timeout):
                         return u'Wordpress后台弱口令，账号：%s 密码：%s' % (user_str, pass_str)
             except urllib2.URLError, e:
                 error_i += 1
-                if error_i >= 3: return
+                if error_i >= 3:
+                    return
             except:
                 return

@@ -1,4 +1,5 @@
 # coding:utf-8
+from config import ProductionConfig
 import urllib2
 import thread
 import time
@@ -16,7 +17,6 @@ from kunpeng import kunpeng
 sys.path.append(sys.path[0] + '/vuldb')
 sys.path.append(sys.path[0] + "/../")
 
-from config import ProductionConfig
 
 db_conn = pymongo.MongoClient(ProductionConfig.DB, ProductionConfig.PORT)
 na_db = getattr(db_conn, ProductionConfig.DBNAME)
@@ -52,7 +52,8 @@ class vulscan():
             self.set_request()  # 标示符转换为请求
             self.poc_check()  # 检测
         elif 'KP-' in self.plugin_info['filename']:
-            self.log(str(self.task_netloc) + 'call kunpeng - ' + self.plugin_info['filename'])
+            self.log(str(self.task_netloc) + 'call kunpeng - ' +
+                     self.plugin_info['filename'])
             kp.set_config(TIMEOUT, PASSWORD_DIC)
             if self.task_netloc[1] != 80:
                 self.result_info = kp.check('service', '{}:{}'.format(
@@ -283,7 +284,7 @@ def init():
         except:
             pass
     for plugin in kp.get_plugin_list():
-        level_list = ['严重','高危','中危','低危','提示']
+        level_list = ['严重', '高危', '中危', '低危', '提示']
         plugin_info = {
             '_id': plugin['references']['kpid'],
             'name': 'Kunpeng -' + plugin['name'],

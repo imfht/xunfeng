@@ -10,6 +10,7 @@ from string import digits, ascii_lowercase
 
 PASSWORD_DIC = []  # set password list for plugin
 
+
 def get_base_path():
     return os.path.dirname(os.path.realpath(__file__))
 
@@ -34,7 +35,7 @@ def main():
         print('[!] usage: python testing.py phpmyadmin 127.0.0.1 8080')
         exit(1)
 
-    print('[*] current filter_word is: %s' %filter_word)
+    print('[*] current filter_word is: %s' % filter_word)
     base_path = get_base_path()
     for filename in os.listdir(os.path.realpath(base_path)):
         if not (filename.endswith('.py') and filter_word in filename):

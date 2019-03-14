@@ -22,7 +22,7 @@ class kunpeng:
             'linux': '.so'
         }
         self._load_kunpeng()
-    
+
     def _get_lib_path(self):
         file_list = os.listdir(self.pwd)
         for v in file_list:
@@ -47,11 +47,11 @@ class kunpeng:
         dat = z_file.read('kunpeng_c' + self.suf_map[self.system])
         print len(dat)
         new_lib = self.pwd + '/kunpeng_v' + version + self.suf_map[self.system]
-        lib_f = open(new_lib,'wb')
+        lib_f = open(new_lib, 'wb')
         lib_f.write(dat)
         lib_f.close()
         z_file.close()
-        print 'update success',version
+        print 'update success', version
         self._load_kunpeng()
 
     def close(self):

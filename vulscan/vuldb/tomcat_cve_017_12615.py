@@ -24,6 +24,7 @@ def get_plugin_info():
 
 class PutRequest(urllib2.Request):
     '''support put method in urllib2'''
+
     def __init__(self, *args, **kwargs):
         self._method = "PUT"
         return urllib2.Request.__init__(self, *args, **kwargs)
@@ -31,9 +32,11 @@ class PutRequest(urllib2.Request):
     def get_method(self, *args, **kwargs):
         return "PUT"
 
+
 def random_str(length):
     pool = string.digits + string.ascii_lowercase
     return "".join(random.choice(pool) for _ in range(length))
+
 
 def check(host, port, timeout):
     result = ""
@@ -64,6 +67,6 @@ def check(host, port, timeout):
                 result += u" 地址: {}".format(shell_url)
                 return result
 
+
 if __name__ == '__main__':
     print(check("127.0.0.1", 8080, 5))
-    

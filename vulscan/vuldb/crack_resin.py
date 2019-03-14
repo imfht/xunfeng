@@ -27,7 +27,8 @@ def check(host, port, timeout):
         for password in PASSWORD_DIC:
             try:
                 PostStr = 'j_username=%s&j_password=%s' % (user, password)
-                res = opener.open(url + '/resin-admin/j_security_check?j_uri=index.php', PostStr ,timeout=timeout)
+                res = opener.open(
+                    url + '/resin-admin/j_security_check?j_uri=index.php', PostStr, timeout=timeout)
                 res_html = res.read()
                 res_code = res.code
             except urllib2.HTTPError, e:
@@ -39,5 +40,6 @@ def check(host, port, timeout):
                 continue
             for flag in flag_list:
                 if flag in res_html or int(res_code) == 408:
-                    info = u'%s/resin-admin 存在弱口令 用户名：%s，密码：%s' % (url, user, password)
+                    info = u'%s/resin-admin 存在弱口令 用户名：%s，密码：%s' % (
+                        url, user, password)
                     return info

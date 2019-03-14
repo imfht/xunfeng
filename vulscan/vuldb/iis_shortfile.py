@@ -24,7 +24,8 @@ def check(ip, port, timeout):
         request = urllib2.Request('http://' + url + flag_400)
         req = urllib2.urlopen(request, timeout=timeout)
         if int(req.code) == 400:
-            req_404 = urllib2.urlopen('http://' + url + flag_404, timeout=timeout)
+            req_404 = urllib2.urlopen(
+                'http://' + url + flag_404, timeout=timeout)
             if int(req_404.code) == 404:
                 return u'iis 短文件名猜解漏洞'
     except Exception, e:

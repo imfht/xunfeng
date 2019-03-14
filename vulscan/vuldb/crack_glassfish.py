@@ -29,8 +29,9 @@ def check(host, port, timeout):
         for password in PASSWORD_DIC:
             try:
                 PostStr = 'j_username=%s&j_password=%s&loginButton=Login&loginButton.DisabledHiddenField=true' % (
-                user, password)
-                request = urllib2.Request(url + '/j_security_check?loginButton=Login', PostStr)
+                    user, password)
+                request = urllib2.Request(
+                    url + '/j_security_check?loginButton=Login', PostStr)
                 res = urllib2.urlopen(request, timeout=timeout)
                 res_html = res.read()
             except urllib2.HTTPError:

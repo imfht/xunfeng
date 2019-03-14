@@ -7,6 +7,7 @@ import time
 import array
 import log
 
+
 class SendPingThr(threading.Thread):
     def __init__(self, ipPool, icmpPacket, icmpSocket, timeout=3):
         threading.Thread.__init__(self)
@@ -32,11 +33,13 @@ class Nscan:
         self.timeout = timeout
         self.__data = struct.pack('d', time.time())
         self.__id = os.getpid()
-        if self.__id >= 65535: self.__id = 65534
+        if self.__id >= 65535:
+            self.__id = 65534
 
     @property
     def __icmpSocket(self):
-        Sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.getprotobyname("icmp"))
+        Sock = socket.socket(socket.AF_INET, socket.SOCK_RAW,
+                             socket.getprotobyname("icmp"))
         return Sock
 
     def __inCksum(self, packet):

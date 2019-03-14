@@ -18,7 +18,6 @@ import urllib2
 import copy
 
 
-
 # 搜索页
 @app.route('/filter')
 @logincheck
@@ -45,7 +44,8 @@ def Main():
     if q:  # 基于搜索条件显示结果
         result = q.strip().split(';')
         query = querylogic(result)
-        cursor = Mongo.coll['Info'].find(query).sort('time', -1).limit(page_size).skip((page - 1) * page_size)
+        cursor = Mongo.coll['Info'].find(query).sort(
+            'time', -1).limit(page_size).skip((page - 1) * page_size)
         return render_template('main.html', item=cursor, plugin=plugin, itemcount=cursor.count(),
                                plugin_type=plugin_type, query=q)
     else:  # 自定义，无任何结果，用户手工添加
@@ -118,7 +118,8 @@ def Addtask():
 @logincheck
 def Task():
     page = int(request.args.get('page', '1'))
-    cursor = Mongo.coll['Task'].find().sort('time', -1).limit(page_size).skip((page - 1) * page_size)
+    cursor = Mongo.coll['Task'].find().sort(
+        'time', -1).limit(page_size).skip((page - 1) * page_size)
     return render_template('task.html', item=cursor)
 
 
@@ -130,7 +131,8 @@ def Recheck():
     task = Mongo.coll['Task'].find_one({'_id': ObjectId(tid)})
     result = 'fail'
     if task and task['plan'] == 0 and task['status'] == 2:  # 一次性任务，并且已经扫描完成
-        result = Mongo.coll['Task'].update({'_id': ObjectId(tid)}, {'$set': {'status': 0}})
+        result = Mongo.coll['Task'].update(
+            {'_id': ObjectId(tid)}, {'$set': {'status': 0}})
         if result:
             result = 'success'
     return result
@@ -148,7 +150,8 @@ def TaskDetail():
     if task_info:
         plugin_name = task_info['plugin']
     vulcount = 0
-    lastscan = Mongo.coll["Result"].distinct('task_date', {'task_id': ObjectId(id)})
+    lastscan = Mongo.coll["Result"].distinct(
+        'task_date', {'task_id': ObjectId(id)})
     result_list = []
     if len(lastscan) > 0:
         lastscan.sort(reverse=True)
@@ -199,7 +202,8 @@ def DeleteTask():
     if oid:
         result = Mongo.coll['Task'].delete_one({'_id': ObjectId(oid)})
         if result.deleted_count > 0:
-            result = Mongo.coll['Result'].delete_many({'task_id': ObjectId(oid)})
+            result = Mongo.coll['Result'].delete_many(
+                {'task_id': ObjectId(oid)})
             if result:
                 return 'success'
     return 'fail'
@@ -218,7 +222,8 @@ def DownloadXls():
             cursor = Mongo.coll['Result'].find({'task_id': ObjectId(tid), 'task_date': taskdate}).sort(
                 'time', -1)
         else:  # 从任务中直接取该任务最新一次扫描结果
-            lastscan = Mongo.coll["Result"].distinct('task_date', {'task_id': ObjectId(tid)})
+            lastscan = Mongo.coll["Result"].distinct(
+                'task_date', {'task_id': ObjectId(tid)})
             if len(lastscan) == 0:
                 cursor = []
                 taskdate = datetime.now()
@@ -237,7 +242,8 @@ def DownloadXls():
                 {'ip': _['ip'], 'port': _['port'], 'info': _['info'], 'vul_level': _['vul_info']['vul_level'],
                  'time': _['time'], 'vul_name': _['vul_info']['vul_name'], 'lastscan': taskdate, 'title': title,
                  'hostname': hostname})
-        response = make_response(CreateTable(result_list, taskdate.strftime("%Y%m%d-%H%M%S")))
+        response = make_response(CreateTable(
+            result_list, taskdate.strftime("%Y%m%d-%H%M%S")))
         if taskdate == '':
             response.headers["Content-Disposition"] = "attachment; filename=nodata.xls;"
         else:
@@ -249,14 +255,16 @@ def DownloadXls():
         t_list = []
         for t in tasks:
             name = t['title']
-            lastscan = Mongo.coll["Result"].distinct('task_date', {'task_id': t['_id']})
+            lastscan = Mongo.coll["Result"].distinct(
+                'task_date', {'task_id': t['_id']})
             if len(lastscan) == 0:
                 cursor = Mongo.coll['Result'].find({'task_id': t['_id']})
                 taskdate = None
             else:
                 lastscan.sort(reverse=True)
                 taskdate = lastscan[0]
-                cursor = Mongo.coll['Result'].find({'task_id': t['_id'], 'task_date': taskdate})
+                cursor = Mongo.coll['Result'].find(
+                    {'task_id': t['_id'], 'task_date': taskdate})
             for _ in cursor:  # 单任务详情
                 hostname = Mongo.coll['Info'].find_one({'ip': _['ip']})
                 if hostname:
@@ -301,13 +309,13 @@ def search_result_xls():
         redirect(url_for('NotFound'))
 
 
-
 # 插件列表页
 @app.route('/plugin')
 @logincheck
 def Plugin():
     page = int(request.args.get('page', '1'))
-    cursor = Mongo.coll['Plugin'].find().limit(page_size).skip((page - 1) * page_size)
+    cursor = Mongo.coll['Plugin'].find().limit(
+        page_size).skip((page - 1) * page_size)
     return render_template('plugin.html', cursor=cursor, vultype=cursor.distinct('type'), count=cursor.count())
 
 
@@ -325,7 +333,8 @@ def AddPlugin():
         if fname.split('.')[-1] == 'py':
             path = file_path + fname
             if os.path.exists(file_path + fname):
-                fname = fname.split('.')[0] + '_' + str(datetime.now().second) + '.py'
+                fname = fname.split('.')[0] + '_' + \
+                    str(datetime.now().second) + '.py'
                 path = file_path + fname
             f.save(path)
             if os.path.exists(path):
@@ -340,7 +349,7 @@ def AddPlugin():
                 insert_result = Mongo.coll['Plugin'].insert(mark_json)
                 if insert_result:
                     result = 'success'
-                    file_name = file_name +'.py'
+                    file_name = file_name + '.py'
 
     else:
         name = request.form.get('name', '')
@@ -360,7 +369,8 @@ def AddPlugin():
                      'keyword': keyword, 'source': 0}
             query['plugin'] = {'method': methodurl.split(' ', 1)[0], 'url': methodurl.split(' ', 1)[1],
                                'analyzing': analyzing, 'analyzingdata': analyzingdata, 'data': pdata, 'tag': tag}
-            file_name = secure_filename(name) + '_' + str(datetime.now().second) + ".json"
+            file_name = secure_filename(
+                name) + '_' + str(datetime.now().second) + ".json"
             with open(file_path + file_name, 'wb') as wt:
                 wt.writelines(json.dumps(query))
             query.pop('plugin')
@@ -379,8 +389,8 @@ def AddPlugin():
             code += _
         params = {'code': code}
         req = urllib2.Request('https://sec.ly.com/xunfeng/pluginupload')
-        req.add_header('Content-Type','application/x-www-form-urlencoded')
-        rsp = urllib2.urlopen(req,urlencode(params))
+        req.add_header('Content-Type', 'application/x-www-form-urlencoded')
+        rsp = urllib2.urlopen(req, urlencode(params))
         print 'upload result:' + rsp.read()
     return result
 
@@ -391,7 +401,8 @@ def AddPlugin():
 def DeletePlugin():
     oid = request.form.get('oid', '')
     if oid:
-        result = Mongo.coll['Plugin'].find_one_and_delete({'_id': ObjectId(oid)}, remove=True)
+        result = Mongo.coll['Plugin'].find_one_and_delete(
+            {'_id': ObjectId(oid)}, remove=True)
         if not result['filename'].find('.') > -1:
             result['filename'] = result['filename'] + '.py'
         if os.path.exists(file_path + result['filename']):
@@ -407,9 +418,11 @@ def Analysis():
     ip = len(Mongo.coll['Info'].distinct('ip'))
     record = Mongo.coll['Info'].find().count()
     task = Mongo.coll['Task'].find().count()
-    vul = int(Mongo.coll['Plugin'].group([], {}, {'count': 0},'function(doc,prev){prev.count = prev.count + doc.count}')[0]['count'])
+    vul = int(Mongo.coll['Plugin'].group([], {}, {
+              'count': 0}, 'function(doc,prev){prev.count = prev.count + doc.count}')[0]['count'])
     plugin = Mongo.coll['Plugin'].find().count()
-    vultype = Mongo.coll['Plugin'].group(['type'], {"count":{"$ne":0}}, {'count': 0},'function(doc,prev){prev.count = prev.count + doc.count}')
+    vultype = Mongo.coll['Plugin'].group(['type'], {"count": {"$ne": 0}}, {
+                                         'count': 0}, 'function(doc,prev){prev.count = prev.count + doc.count}')
     cur = Mongo.coll['Statistics'].find().sort('date', -1).limit(30)
     trend = []
     for i in cur:
@@ -430,7 +443,8 @@ def Analysis():
     server_type = Mongo.coll['Info'].aggregate(
         [{'$group': {'_id': '$server', 'count': {'$sum': 1}}}, {'$sort': {'count': -1}}])
     web_type = Mongo.coll['Info'].aggregate([{'$match': {'server': 'web'}}, {'$unwind': '$webinfo.tag'},
-                                             {'$group': {'_id': '$webinfo.tag', 'count': {'$sum': 1}}},
+                                             {'$group': {'_id': '$webinfo.tag',
+                                                         'count': {'$sum': 1}}},
                                              {'$sort': {'count': -1}}])
     return render_template('analysis.html', ip=ip, record=record, task=task, vul=vul, plugin=plugin, vultype=vultype,
                            trend=sorted(trend, key=lambda x: x['time']), taskpercent=taskpercent, taskalive=taskalive,
@@ -468,15 +482,18 @@ def UpdateConfig():
     conftype = request.form.get('conftype', '')
     if name and value and conftype:
         if name == 'Masscan' or name == 'Port_list':
-            origin_value = Mongo.coll['Config'].find_one({'type': 'nascan'})["config"][name]["value"]
+            origin_value = Mongo.coll['Config'].find_one(
+                {'type': 'nascan'})["config"][name]["value"]
             value = origin_value.split('|')[0] + '|' + value
         elif name == 'Port_list_Flag':
             name = 'Port_list'
-            origin_value = Mongo.coll['Config'].find_one({'type': 'nascan'})["config"]['Port_list']["value"]
+            origin_value = Mongo.coll['Config'].find_one(
+                {'type': 'nascan'})["config"]['Port_list']["value"]
             value = value + '|' + origin_value.split('|')[1]
         elif name == 'Masscan_Flag':
             name = 'Masscan'
-            path = Mongo.coll['Config'].find_one({'type': 'nascan'})["config"]["Masscan"]["value"]
+            path = Mongo.coll['Config'].find_one({'type': 'nascan'})[
+                "config"]["Masscan"]["value"]
             if len(path.split('|')) == 3:
                 path = path.split('|')[1] + "|" + path.split('|')[2]
             else:
@@ -485,7 +502,8 @@ def UpdateConfig():
                 value = '1|' + path
             else:
                 value = '0|' + path
-        result = Mongo.coll['Config'].update({"type": conftype}, {'$set': {'config.' + name + '.value': value}})
+        result = Mongo.coll['Config'].update(
+            {"type": conftype}, {'$set': {'config.' + name + '.value': value}})
         if result:
             rsp = 'success'
     return rsp
@@ -507,7 +525,8 @@ def PullUpdate():
                 for remote in remotelist:
                     if p['name'] == remote['name'] and remote['coverage'] == 0:
                         remotelist.remove(remote)
-            locallist = Mongo.coll['Update'].aggregate([{'$project': {'_id': 0, 'unicode': 1}}])
+            locallist = Mongo.coll['Update'].aggregate(
+                [{'$project': {'_id': 0, 'unicode': 1}}])
             local = []
             for i in locallist:
                 local.append(i['unicode'])
@@ -526,7 +545,8 @@ def PullUpdate():
 @logincheck
 def CheckUpdate():
     json = []
-    notinstall = Mongo.coll['Update'].find({'isInstall': 0}).sort('unicode', -1)
+    notinstall = Mongo.coll['Update'].find(
+        {'isInstall': 0}).sort('unicode', -1)
     for _ in notinstall:
         json.append({'unicode': _['unicode'], 'name': _['name'], 'info': _['info'], 'time': _['pushtime'],
                      'author': _['author']})
@@ -540,23 +560,27 @@ def installplugin():
     rsp = 'fail'
     unicode = request.args.get('unicode', '')
     item = Mongo.coll['Update'].find_one({'unicode': unicode})
-    if item.get('source','') == 'kunpeng':
-        Mongo.coll['Update'].update_one({'unicode': unicode}, {'$set': {'isInstall': 1}})
+    if item.get('source', '') == 'kunpeng':
+        Mongo.coll['Update'].update_one(
+            {'unicode': unicode}, {'$set': {'isInstall': 1}})
         return 'success'
     json_string = {'add_time': datetime.now(), 'count': 0, 'source': 1}
     file_name = secure_filename(item['location'].split('/')[-1])
     if os.path.exists(file_path + file_name):
         if ".py" in file_name:
-            db_record = Mongo.coll['Plugin'].find_one({'filename': file_name.split('.')[0]})
+            db_record = Mongo.coll['Plugin'].find_one(
+                {'filename': file_name.split('.')[0]})
         else:
             db_record = Mongo.coll['Plugin'].find_one({'filename': file_name})
         if not db_record or not db_record['source'] == 1:
             file_name = file_name.split('.')[0] + '_' + str(datetime.now().second) + '.' + \
-                        file_name.split('.')[-1]
+                file_name.split('.')[-1]
         else:
-            db_record = Mongo.coll['Plugin'].delete_one({'filename': file_name.split('.')[0]})
+            db_record = Mongo.coll['Plugin'].delete_one(
+                {'filename': file_name.split('.')[0]})
     if item['location'].find('/') == -1:
-        urlretrieve('https://sec.ly.com/xunfeng/getplugin?name=' + item['location'], file_path + file_name)
+        urlretrieve('https://sec.ly.com/xunfeng/getplugin?name=' +
+                    item['location'], file_path + file_name)
     else:
         urlretrieve(item['location'], file_path + file_name)  # 兼容旧的插件源
     if os.path.exists(file_path + file_name):
@@ -572,7 +596,8 @@ def installplugin():
                 mark_json.pop('plugin')
             json_string.update(mark_json)
             Mongo.coll['Plugin'].insert(json_string)
-            Mongo.coll['Update'].update_one({'unicode': unicode}, {'$set': {'isInstall': 1}})
+            Mongo.coll['Update'].update_one(
+                {'unicode': unicode}, {'$set': {'isInstall': 1}})
             rsp = 'success'
         except:
             pass

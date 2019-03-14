@@ -2,6 +2,7 @@
 import base64
 import urllib2
 
+
 def get_plugin_info():
     plugin_info = {
         "name": ".NET Padding Oracle信息泄露",
@@ -15,6 +16,7 @@ def get_plugin_info():
     }
     return plugin_info
 
+
 def check(ip, port, timeout):
     try:
         url = 'http://' + ip + ":" + str(port)
@@ -23,9 +25,11 @@ def check(ip, port, timeout):
             error_i = 0
             bglen = 0
             for k in range(0, 255):
-                IV = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" + chr(k)
+                IV = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" + \
+                    chr(k)
                 bgstr = 'A' * 21 + '1'
-                enstr = base64.b64encode(IV).replace('=', '').replace('/', '-').replace('+', '-')
+                enstr = base64.b64encode(IV).replace(
+                    '=', '').replace('/', '-').replace('+', '-')
                 exp_url = "%s/WebResource.axd?d=%s" % (url, enstr + bgstr)
                 try:
                     request = urllib2.Request(exp_url)
@@ -37,7 +41,8 @@ def check(ip, port, timeout):
                     res_code = e.code
                 except urllib2.URLError, e:
                     error_i += 1
-                    if error_i >= 3: return
+                    if error_i >= 3:
+                        return
                 except:
                     return
                 if int(res_code) == 200 or int(res_code) == 500:

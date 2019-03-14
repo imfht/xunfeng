@@ -24,7 +24,8 @@ def check(ip, port, timeout):
     for user in user_list:
         for password in PASSWORD_DIC:
             try:
-                login_url = 'http://' + ip + ":" + str(port) + '/ISAPI/Security/userCheck'
+                login_url = 'http://' + ip + ":" + \
+                    str(port) + '/ISAPI/Security/userCheck'
                 request = urllib2.Request(login_url)
                 auth_str_temp = user + ':' + password
                 auth_str = base64.b64encode(auth_str_temp)
@@ -37,10 +38,13 @@ def check(ip, port, timeout):
                 res_html = e.read()
             except urllib2.URLError, e:
                 error_i += 1
-                if error_i >= 3: return
+                if error_i >= 3:
+                    return
                 continue
-            if int(res_code) == 404 or int(res_code) == 403: return
-            if int(res_code) == 401: continue
+            if int(res_code) == 404 or int(res_code) == 403:
+                return
+            if int(res_code) == 401:
+                continue
             for flag in flag_list:
                 if flag in res_html:
                     return u'Hikvision网络摄像头弱口令 %s:%s' % (user, password)

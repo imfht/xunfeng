@@ -56,6 +56,7 @@ def check(ip, port, timeout):
         except Exception, e:
             if e.code == 500:
                 time.sleep(2)
-                check = urllib2.urlopen("http://%s:8088/%s" % (server_ip, test_str), timeout=timeout).read()
+                check = urllib2.urlopen(
+                    "http://%s:8088/%s" % (server_ip, test_str), timeout=timeout).read()
                 if "YES" in check:
                     return u"S2-052 远程代码执行漏洞"

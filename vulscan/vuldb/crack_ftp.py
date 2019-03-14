@@ -26,8 +26,11 @@ def check(ip, port, timeout):
                 ftp.timeout = timeout
                 ftp.connect(ip, port)
                 ftp.login(user, pass_)
-                if pass_ == '': pass_ = "null"
-                if user == 'ftp' and pass_ == 'ftp': return u"可匿名登录"
+                if pass_ == '':
+                    pass_ = "null"
+                if user == 'ftp' and pass_ == 'ftp':
+                    return u"可匿名登录"
                 return u"存在弱口令，账号：%s，密码：%s" % (user, pass_)
             except Exception, e:
-                if "Errno 10061" in str(e) or "timed out" in str(e): return
+                if "Errno 10061" in str(e) or "timed out" in str(e):
+                    return

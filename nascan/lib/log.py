@@ -5,6 +5,8 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
 mutex = threading.Lock()
+
+
 def write(scan_type, host, port, info):
     mutex.acquire()
     port = int(port)
@@ -22,6 +24,6 @@ def write(scan_type, host, port, info):
         elif scan_type == 'info':
             print "[%s] %s" % (time_str, info)
     except Exception, e:
-        print 'logerror',e
+        print 'logerror', e
         pass
     mutex.release()

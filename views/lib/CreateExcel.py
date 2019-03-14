@@ -23,11 +23,13 @@ def write_data(data, tname):
 # excel业务逻辑处理
 def CreateTable(cursor, id):
     item = []
-    item.append(['IP', '端口', '主机名', '风险等级', '漏洞描述', '插件类型', '任务名称', '时间', '扫描批次'])
+    item.append(['IP', '端口', '主机名', '风险等级', '漏洞描述',
+                 '插件类型', '任务名称', '时间', '扫描批次'])
     for i in cursor:
         if i['lastscan']:
             _ = [i['ip'], i['port'], i['hostname'], i['vul_level'], i['info'],
-                 i['vul_name'], i['title'], i['time'].strftime('%Y-%m-%d %H:%M:%S'),
+                 i['vul_name'], i['title'], i['time'].strftime(
+                     '%Y-%m-%d %H:%M:%S'),
                  i['lastscan'].strftime('%Y-%m-%d %H:%M:%S')]
         else:
             _ = [i['ip'], i['port'], i['hostname'], i['vul_level'], i['info'],

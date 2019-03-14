@@ -31,13 +31,14 @@ def auth(host, port, username, password, timeout):
         packet_length = len(username) + 7 + len(
             "\x03user  database postgres application_name psql client_encoding UTF8  ")
         p = "%c%c%c%c%c\x03%c%cuser%c%s%cdatabase%cpostgres%capplication_name%cpsql%cclient_encoding%cUTF8%c%c" % (
-        0, 0, 0, packet_length, 0, 0, 0, 0, username, 0, 0, 0, 0, 0, 0, 0, 0)
+            0, 0, 0, packet_length, 0, 0, 0, 0, username, 0, 0, 0, 0, 0, 0, 0, 0)
         sock.send(p)
         packet = sock.recv(1024)
         if packet[0] == 'R':
             authentication_type = str([packet[8]])
             c = int(authentication_type[4:6], 16)
-            if c == 5: salt = packet[9:]
+            if c == 5:
+                salt = packet[9:]
         else:
             return 3
         lmd5 = make_response(username, password, salt)
@@ -48,7 +49,8 @@ def auth(host, port, username, password, timeout):
         if packet1[0] == "R":
             return True
     except Exception, e:
-        if "Errno 10061" in str(e) or "timed out" in str(e): return 3
+        if "Errno 10061" in str(e) or "timed out" in str(e):
+            return 3
 
 
 def check(ip, port, timeout):
@@ -58,7 +60,9 @@ def check(ip, port, timeout):
             try:
                 pass_ = str(pass_.replace('{user}', user))
                 result = auth(ip, port, user, pass_, timeout)
-                if result == 3: break
-                if result == True: return u"存在弱口令，用户名：%s 密码：%s" % (user, pass_)
+                if result == 3:
+                    break
+                if result == True:
+                    return u"存在弱口令，用户名：%s 密码：%s" % (user, pass_)
             except Exception, e:
                 pass

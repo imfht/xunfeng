@@ -100,5 +100,6 @@ def vc(v1, v2):
     if(d1 == d2):
         return '='
 
+
 if __name__ == '__main__':
     print check("127.0.0.1", 9001, 10)

@@ -32,7 +32,8 @@ def get_url(domain, timeout):
                 if domain == ParseResult.hostname:
                     url_list.append(HTMLParser.HTMLParser().unescape(url[1]))
             elif not ParseResult.netloc and not ParseResult.scheme:
-                url_list.append(HTMLParser.HTMLParser().unescape(urlparse.urljoin(root_url, url[1])))
+                url_list.append(HTMLParser.HTMLParser().unescape(
+                    urlparse.urljoin(root_url, url[1])))
     return list(set(url_list))
 
 
@@ -60,7 +61,8 @@ def check(ip, port, timeout):
     i = 0
     for url in url_list:
         if re.search("\.action|\.do", url):
-            if i >= 3: break
+            if i >= 3:
+                break
             i += 1
             for ver in flag_list:
                 for poc in flag_list[ver]['poc']:
@@ -70,7 +72,8 @@ def check(ip, port, timeout):
                             request.add_header("Content-Type", poc)
                         else:
                             request = urllib2.Request(url, poc)
-                        res_html = urllib2.urlopen(request, timeout=timeout).read(204800)
+                        res_html = urllib2.urlopen(
+                            request, timeout=timeout).read(204800)
                         if flag_list[ver]['key'] in res_html:
                             return ver + u" 代码执行漏洞"
                     except:

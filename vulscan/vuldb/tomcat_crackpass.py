@@ -39,10 +39,13 @@ def check(ip, port, timeout):
                 res_html = e.read()
             except urllib2.URLError, e:
                 error_i += 1
-                if error_i >= 3: return
+                if error_i >= 3:
+                    return
                 continue
-            if int(res_code) == 404: return
-            if int(res_code) == 401 or int(res_code) == 403: continue
+            if int(res_code) == 404:
+                return
+            if int(res_code) == 401 or int(res_code) == 403:
+                continue
             for flag in flag_list:
                 if flag in res_html:
                     return u'Tomcat弱口令 %s:%s' % (user, pass_)

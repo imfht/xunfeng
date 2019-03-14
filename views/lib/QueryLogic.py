@@ -28,13 +28,15 @@ def querylogic(list):
                         query['banner'] = {"$regex": q_value, '$options': 'i'}
                     else:
                         text_query = mgo_text_split(q_value)
-                        query['$text'] = {'$search': text_query, '$caseSensitive':True}
+                        query['$text'] = {
+                            '$search': text_query, '$caseSensitive': True}
                 elif q_key == 'ip':
                     query['ip'] = {"$regex": q_value}
                 elif q_key == 'server':
                     query['server'] = q_value.lower()
                 elif q_key == 'title':
-                    query['webinfo.title'] = {"$regex": q_value, '$options': 'i'}
+                    query['webinfo.title'] = {
+                        "$regex": q_value, '$options': 'i'}
                 elif q_key == 'tag':
                     query['webinfo.tag'] = q_value.lower()
                 elif q_key == 'hostname':
@@ -42,7 +44,8 @@ def querylogic(list):
                 elif q_key == 'all':
                     filter_lst = []
                     for i in ('ip', 'banner', 'port', 'time', 'webinfo.tag', 'webinfo.title', 'server', 'hostname'):
-                        filter_lst.append({i: {"$regex": q_value, '$options': 'i'}})
+                        filter_lst.append(
+                            {i: {"$regex": q_value, '$options': 'i'}})
                     query['$or'] = filter_lst
                 else:
                     query[q_key] = q_value

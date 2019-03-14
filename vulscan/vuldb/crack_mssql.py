@@ -2,6 +2,7 @@
 import socket
 import binascii
 
+
 def get_plugin_info():
     plugin_info = {
         "name": "SQL Server弱口令",
@@ -14,6 +15,7 @@ def get_plugin_info():
         "source": 1
     }
     return plugin_info
+
 
 def auth(host, port, username, password, timeout):
     try:
@@ -62,5 +64,6 @@ def check(ip, port, timeout):
                 result = auth(ip, port, user, pass_, timeout)
                 if result == True:
                     return u"存在弱口令，账号：%s，密码：%s" % (user, pass_)
-            except Exception,e:
-                if "Errno 10061" in str(e) or "timed out" in str(e): return
+            except Exception, e:
+                if "Errno 10061" in str(e) or "timed out" in str(e):
+                    return

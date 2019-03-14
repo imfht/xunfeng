@@ -12,7 +12,9 @@ from exceptions import Exception
 def hex2str(x):
     return x.replace(' ', '').replace('\n', '').decode('hex')
 
+
 ver_num_com = re.compile('@RSYNCD: (\d+)')
+
 
 class ReqNoUnderstandError(Exception):
     pass
@@ -47,18 +49,16 @@ class RsyncWeakCheck(object):
         self.timeout = timeout
         self.sock = None
 
-
     def _rsync_init(self):
-        sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         socket.setdefaulttimeout(self.timeout)
-        sock.connect((self.host,self.port))
+        sock.connect((self.host, self.port))
         sock.send(self._hello_request)
         res = sock.recv(1024)
         self.sock = sock
         return res
 
-
-    def is_path_not_auth(self, path_name = ''):
+    def is_path_not_auth(self, path_name=''):
         '''\
         验证某一目录是否可以被未授权访问
         >>> result = is_path_not_auth('nearg1e')
@@ -81,7 +81,6 @@ class RsyncWeakCheck(object):
             return -1
         else:
             raise ReqNoUnderstandError()
-
 
     def get_all_pathname(self):
         self._rsync_init()
@@ -116,27 +115,27 @@ class RsyncWeakCheck(object):
             else:
                 return False
 
-
     def _get_ver_num(self, ver_string=''):
         if ver_string:
             ver_num = ver_num_com.match(ver_string).group(1)
             if ver_num.isdigit():
                 return int(ver_num)
-            else: return 0
+            else:
+                return 0
         else:
             return 0
 
 
 def get_plugin_info():
     plugin_info = {
-        "name":"rsync未授权访问与弱验证",
-        "info":"可以通过rsync服务下载服务器上敏感数据",
-        "level":"高危",
-        "type":"信息泄露",
-        "author":"nearg1e@ysrc",
-        "source":1,
-        "url":"http://drops.wooyun.org/papers/161",
-        "keyword":"port:873"
+        "name": "rsync未授权访问与弱验证",
+        "info": "可以通过rsync服务下载服务器上敏感数据",
+        "level": "高危",
+        "type": "信息泄露",
+        "author": "nearg1e@ysrc",
+        "source": 1,
+        "url": "http://drops.wooyun.org/papers/161",
+        "keyword": "port:873"
     }
     return plugin_info
 
@@ -151,7 +150,7 @@ def check(host, port, timeout=5):
     else:
         passwdlist = PASSWORD_DIC
     try:
-        rwc = RsyncWeakCheck(host,port)
+        rwc = RsyncWeakCheck(host, port)
         for path_name in rwc.get_all_pathname():
             ret = rwc.is_path_not_auth(path_name)
             if ret == 0:
@@ -159,9 +158,11 @@ def check(host, port, timeout=5):
             elif ret == 1:
                 for username, passwd in product(userlist, passwdlist):
                     try:
-                        res = rwc.weak_passwd_check(path_name, username, passwd)
+                        res = rwc.weak_passwd_check(
+                            path_name, username, passwd)
                         if res:
-                            weak_auth_list.append((path_name, username, passwd))
+                            weak_auth_list.append(
+                                (path_name, username, passwd))
                     except VersionNotSuppError as e:
                         # TODO fengxun error support
                         pass
@@ -169,12 +170,13 @@ def check(host, port, timeout=5):
         pass
 
     if not_unauth_list:
-        info += u'未授权访问目录有:%s;' %','.join(not_unauth_list)
+        info += u'未授权访问目录有:%s;' % ','.join(not_unauth_list)
     if weak_auth_list:
         for weak_auth in weak_auth_list:
-            info += u'目录%s存在弱验证:%s:%s;' %weak_auth
+            info += u'目录%s存在弱验证:%s:%s;' % weak_auth
     if info:
         return info
+
 
 if __name__ == '__main__':
     ip_list = []

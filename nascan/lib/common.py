@@ -6,6 +6,7 @@ import datetime
 import time
 import base64
 
+
 def format_config(config_name, config_info):
     mark_list = []
     try:
@@ -28,21 +29,27 @@ def get_config():
     config_info = mongo.na_db.Config.find_one({"type": "nascan"})
     for name in config_info['config']:
         if name in ['Discern_cms', 'Discern_con', 'Discern_lang', 'Discern_server']:
-            config[name] = format_config(name, config_info['config'][name]['value'])
+            config[name] = format_config(
+                name, config_info['config'][name]['value'])
         else:
             config[name] = config_info['config'][name]['value']
     return config
+
 
 def monitor(CONFIG_INI, STATISTICS, NACHANGE):
     while True:
         try:
             time_ = datetime.datetime.now()
             date_ = time_.strftime('%Y-%m-%d')
-            mongo.na_db.Heartbeat.update({"name": "heartbeat"}, {"$set": {"up_time": time_}})
-            if date_ not in STATISTICS: STATISTICS[date_] = {"add": 0, "update": 0, "delete": 0}
-            mongo.na_db.Statistics.update({"date": date_}, {"$set": {"info": STATISTICS[date_]}}, upsert=True)
+            mongo.na_db.Heartbeat.update({"name": "heartbeat"}, {
+                                         "$set": {"up_time": time_}})
+            if date_ not in STATISTICS:
+                STATISTICS[date_] = {"add": 0, "update": 0, "delete": 0}
+            mongo.na_db.Statistics.update(
+                {"date": date_}, {"$set": {"info": STATISTICS[date_]}}, upsert=True)
             new_config = get_config()
-            if base64.b64encode(CONFIG_INI["Scan_list"]) != base64.b64encode(new_config["Scan_list"]):NACHANGE[0] = 1
+            if base64.b64encode(CONFIG_INI["Scan_list"]) != base64.b64encode(new_config["Scan_list"]):
+                NACHANGE[0] = 1
             CONFIG_INI.clear()
             CONFIG_INI.update(new_config)
         except Exception, e:
@@ -59,7 +66,8 @@ def get_statistics():
     else:
         return {date_: now_stati['info']}
 
-def cruise(STATISTICS,MASSCAN_AC):
+
+def cruise(STATISTICS, MASSCAN_AC):
     while True:
         now_str = datetime.datetime.now()
         week = int(now_str.weekday())
@@ -76,7 +84,8 @@ def cruise(STATISTICS,MASSCAN_AC):
                     ip = history_info['ip']
                     port = history_info['port']
                     try:
-                        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        sock = socket.socket(
+                            socket.AF_INET, socket.SOCK_STREAM)
                         sock.connect((ip, int(port)))
                         sock.close()
                     except Exception, e:
